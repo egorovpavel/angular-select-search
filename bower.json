@@ -1,7 +1,7 @@
 {
-  "name": "angular-select-search",
+  "name": "angular-select-find",
   "main": "angular-select-search.js",
-  "version": "1.3.12",
+  "version": "1.3.14",
   "authors": [
     "Iskren Slavov <iskren.s@gmail.com>"
   ],
@@ -19,7 +19,7 @@
     "angular": "1.2 - 1.3"
   },
   "license": "MIT",
-  "homepage": "https://github.com/zewish/angular-select-search",
+  "homepage": "https://github.com/egorovpavel/angular-select-search.git",
   "ignore": [
     "**/.*",
     "node_modules",
