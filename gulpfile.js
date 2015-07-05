@@ -14,7 +14,7 @@ gulp.task('templateCache', function() {
 });
 
 gulp.task('buildMinified', ['templateCache'], function() {
-    return gulp.src(['src/*.js', 'src/*/*.js', 'bower_components/angular-vs-repeat/angular-vs-repeat.js'])
+    return gulp.src(['src/*.js', 'src/*/*.js', 'bower_components/angular-vs-repeat/src/angular-vs-repeat.js'])
         .pipe(uglify({
             mangle: false
         }))
@@ -23,7 +23,7 @@ gulp.task('buildMinified', ['templateCache'], function() {
 });
 
 gulp.task('build', ['buildMinified'], function() {
-    return gulp.src(['src/*.js', 'src/*/*.js', 'bower_components/angular-vs-repeat/angular-vs-repeat.js'])
+    return gulp.src(['src/*.js', 'src/*/*.js', 'bower_components/angular-vs-repeat/src/angular-vs-repeat.js'])
         .pipe(concat('angular-select-search.js'))
         .pipe(gulp.dest('dist'));
 });

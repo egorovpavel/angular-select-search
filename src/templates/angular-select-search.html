@@ -9,18 +9,17 @@
     </button>
 
     <div ng-show="opened" class="dropdown-menu">
-        <div class="bs-searchbox">
+        <div class="bs-searchbox" ng-show="length >= 10">
             <input ng-model="filter" ng-click="noop($event)" type="text"
               class="input-block-level form-control" autocomplete="off" />
         </div>
-        <ul ng-show="opened" class="dropdown-menu inner"
-          style="display: block; overflow-y: auto; min-height: 0px;"
-          ng-style="{ 'max-height': ssHeight + 'px' }">
+        <ul vs-repeat vs-options="{latch: true}" vs-excess="20" ng-show="opened" class="dropdown-menu inner"
+          style="display: block; overflow-y: auto; min-height: 0px;max-height:200px;position: relative;" >
             {{ select(selected, (selected >= 0 && index === -1)) }}
             <li ng-repeat="item in items | filter: filter"
-              ng-class="{ active: (index == $index) }">
-                {{ select($index, (index === -1 && item[key] == value)) }}
-                <a ng-click="select($index)">{{item[content]}}</a>
+              ng-class="{ active: (index == startIndex+$index) }" style="position: absolute; width: 100%;">
+                {{ select(startIndex+$index, (index === -1 && item[key] == value)) }}
+                <a ng-click="select(startIndex+$index)">{{item[content]}}</a>
             </li>
         </ul>
     </div>

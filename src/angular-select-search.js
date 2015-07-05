@@ -1,4 +1,4 @@
-angular.module('selectSearch', [])
+angular.module('selectSearch', ['vs-repeat'])
 .directive('selectSearch', function($window, $filter, $timeout, $animate) {
     return {
         restrict: 'A'
@@ -11,6 +11,7 @@ angular.module('selectSearch', [])
 
             , ngRequired: '='
             , ngDisabled: '='
+            , ngChange: '&'
 
             , ssHeight: '@'
             , ssClass: '@'
@@ -22,27 +23,40 @@ angular.module('selectSearch', [])
         , controller: function($scope) {
             $scope.items = $scope.itemsAll;
             $scope.ssHeight = $scope.ssHeight || 200;
+            $scope.length = $scope.itemsAll ? $scope.itemsAll.length : 0;
             $scope.content = $scope.content || 'title';
             $scope.key = $scope.key || 'value';
             $scope.placeholder = $scope.placeholder || '';
             $scope.index = -1;
+            if($scope.value && $scope.itemsAll){
+                var selected;
+                for(var idx in $scope.itemsAll){
+                    if($scope.itemsAll[idx][$scope.key] == $scope.value){
+                        selected = $scope.itemsAll[idx];
+                        break;
+                    }
+                }
+                $scope.title = selected[$scope.content];
+            }
+
             $scope.select = function(index, condition) {
                 index = parseInt(index);
                 condition = (angular.isDefined(condition)) ? condition : true;
                 if (!condition) {
                     return;
                 }
-
                 $scope.index = index;
                 if (angular.isDefined($scope.selected)) {
                     $scope.selected = index;
                 }
-
+                if($scope.items[index] && $scope.value != $scope.items[index][$scope.key]){
+                    $scope.ngChange();
+                }
                 if (!angular.isDefined($scope.items[index])) {
                     return;
                 }
-                $scope.value = $scope.items[index][$scope.key];
-                $scope.title = $scope.items[index][$scope.content];
+                $scope.value = $scope.itemsAll[index][$scope.key];
+                $scope.title = $scope.itemsAll[index][$scope.content];
             };
 
             $scope.dropup = false;
@@ -60,6 +74,9 @@ angular.module('selectSearch', [])
                     $scope.dropup = false;
                 }
                 $scope.$apply();
+                $timeout(function () {
+                    $scope.moveScroll();
+                },0);
             };
 
             $scope.opened = false;
@@ -88,9 +105,11 @@ angular.module('selectSearch', [])
                     if ($scope.opened) {
                         $scope.searchInput.focus();
                         angular.element($window).bind('keydown', $scope.keydown);
+                        angular.element($window).bind('keyup', $scope.keyup);
                     }
                     else {
                         angular.element($window).unbind('keydown', $scope.keydown);
+                        angular.element($window).unbind('keyup', $scope.keyup);
                     }
                     $scope.reposition();
                     $scope.moveScroll();
@@ -113,13 +132,23 @@ angular.module('selectSearch', [])
                     $scope.select($scope.index);
                     $scope.close();
                 }
+                $timeout(function () {
+                    $scope.moveScroll();
+                },0);
+            };
+            $scope.keyup = function(ev) {
+                $timeout(function () {
+                    $scope.moveScroll();
+                },0);
             };
 
             $scope.down = function() {
                 if ($scope.index + 1 < $scope.items.length) {
                     $scope.index++;
                     $scope.$apply();
-                    $scope.moveScroll();
+                    $timeout(function () {
+                        $scope.moveScroll();
+                    },0);
                 }
             };
 
@@ -128,24 +157,16 @@ angular.module('selectSearch', [])
                 if ($scope.index - 1 >= 0) {
                     $scope.index -= 1;
                     $scope.$apply();
-                    $scope.moveScroll();
+                    $timeout(function () {
+                        $scope.moveScroll();
+                    },0);
                 }
             };
 
             $scope.moveScroll = function() {
-                var ul = angular.element($scope.dropdownMenu).find('ul')
-                    , liElems = ul.find('li');
-                Array.prototype.forEach.call(liElems, function(li, i) {
-                    if (!angular.element(li).hasClass('active')) {
-                        return;
-                    }
-                    var posLi = li.getBoundingClientRect()
-                        , posMenu = $scope.dropdownMenu.getBoundingClientRect();
-
-                    if (posLi.bottom > posMenu.bottom || posLi.top > posMenu.top) {
-                        ul[0].scrollTop = (posLi.bottom - posLi.top) * i;
-                    }
-                });
+                if($scope.index >= 0){
+                    $scope.$broadcast('vsRepeatTrigger',{scrollIndex:$scope.index,scrollIndexPosition:'inview#auto'});
+                }
             };
 
             $scope.removeWatchers = $scope.$watch('[filter,value,itemsAll]', function() {
