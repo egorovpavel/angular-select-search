@@ -57,6 +57,9 @@ angular.module('selectSearch', ['vs-repeat'])
                 }
                 $scope.value = $scope.itemsAll[index][$scope.key];
                 $scope.title = $scope.itemsAll[index][$scope.content];
+                $timeout(function(){
+                    $scope.close();
+                });
             };
 
             $scope.dropup = false;
@@ -81,8 +84,10 @@ angular.module('selectSearch', ['vs-repeat'])
 
             $scope.opened = false;
             $scope.toggle = function(ev) {
-                ev.preventDefault();
-                ev.stopPropagation();
+                if(ev){
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                }
                 $scope.opened = !$scope.opened;
                 if (!$scope.opened) {
                     $scope.touched();
